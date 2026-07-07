@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poluser Pro Career 26 | Global Fix</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0c0f12;
+            color: #ffffff;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            background: #161b22;
+            border-radius: 24px;
+            padding: 16px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.7);
+            border: 1px solid #30363d;
+            box-sizing: border-box;
+        }
+        h2, h3 { color: #00ff88; text-align: center; margin-top: 0; }
+        .screen { display: none; }
+        .active { display: block; }
+        
+        .hud {
+            background: #0d1117;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            font-size: 13px;
+            border: 1px solid #21262d;
+        }
+        .hud-item { font-weight: bold; color: #8b949e; }
+        .hud-item span { color: #fff; }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            background: #0d1117;
+            padding: 6px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #21262d;
+            gap: 2px;
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #8b949e;
+            font-weight: bold;
+            font-size: 10px;
+            cursor: pointer;
+            padding: 6px 2px;
+            border-radius: 6px;
+            flex: 1;
+            text-align: center;
+        }
+        .nav-btn.active-tab { background: #00ff88; color: #000; }
+
+        label { display: block; margin: 8px 0 4px; font-size: 14px; color: #c9d1d9; }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #fff;
+            border-radius: 8px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn:hover { background: #00cc6e; }
+
+        .scoreboard {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .live-timer { color: #ff3333; font-size: 14px; }
+        
+        .pitch-container {
+            background: #1e4620;
+            border: 2px solid #fff;
+            border-radius: 8px;
+            height: 120px;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .center-circle {
+            border: 2px solid rgba(255,255,255,0.4);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .ball {
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transition: all 0.2s linear;
+        }
+        
+        .list-card {
+            background: #21262d;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #30363d;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        th, td {
+            padding: 6px;
+            text-align: left;
+            border-bottom: 1px solid #30363d;
+        }
+        th { color: #8b949e; }
+        .highlight-row { background: rgba(0, 255, 136, 0.15); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div id="screen-setup" class="screen active">
+        <h2>⚽ Create Pro Player</h2>
+        <label>First Name</label>
+        <input type="text" id="setup-first" value="Poluser">
+        
+        <label>Last Name</label>
+        <input type="text" id="setup-last" value="Seven">
+
+        <label>Player Position</label>
+        <select id="setup-pos">
+            <option value="ST">Striker (ST)</option>
+            <option value="LW">Left Winger (LW)</option>
+            <option value="CAM">Midfielder (CAM)</option>
+            <option value="CB">Center Back (CB)</option>
+            <option value="GK">Goalkeeper (GK)</option>
+        </select>
+
+        <label>Select Nationality (Top 50 Nations)</label>
+        <select id="setup-nation">
+            </select>
+
+        <label>Select Club League</label>
+        <select id="setup-league" onchange="populateClubs()">
+            <option value="Premier League">English Premier League</option>
+            <option value="La Liga">Spanish La Liga</option>
+            <option value="Bundesliga">German Bundesliga</option>
+            <option value="Serie A">Italian Serie A</option>
+        </select>
+
+        <label>Select Starting Youth Academy</label>
+        <select id="setup-club">
+            </select>
+
+        <label>Starting Career Path</label>
+        <select id="setup-path">
+            <option value="underdog">Academy Underdog (35-55 OVR)</option>
+            <option value="potential">Top Prospect (55-80 OVR)</option>
+            <option value="legend">The Next Legend (80-100 OVR)</option>
+        </select>
+
+        <button class="btn" onclick="startGame()">Kick Off Career</button>
+    </div>
+
+    <div id="game-hub" style="display:none;">
+        <div class="hud">
+            <div class="hud-item">Player: <span id="hud-name">-</span></div>
+            <div class="hud-item">Age/Season: <span id="hud-age">16</span></div>
+            <div class="hud-item">Club: <span id="hud-club">-</span></div>
+            <div class="hud-item">Nation: <span id="hud-nation">-</span></div>
+            <div class="hud-item">OVR: <span id="hud-ovr" style="color:#00ff88">0</span></div>
+            <div class="hud-item">Coins: <span id="hud-coins" style="color:#00ff88">0</span></div>
+            <div class="hud-item">Energy: <span id="hud-energy">100%</span></div>
+            <div class="hud-item">Status: <span id="hud-status" style="color:#00ff88">Academy</span></div>
+        </div>
+
+        <div class="nav-bar">
+            <button class="nav-btn active-tab" id="tab-match" onclick="showTab('match')">MATCH</button>
+            <button class="nav-btn" id="tab-standings" onclick="showTab('standings')">TABLES</button>
+            <button class="nav-btn" id="tab-skills" onclick="showTab('skills')">SKILLS</button>
+            <button class="nav-btn" id="tab-social" onclick="showTab('social')">RELATIONS</button>
+            <button class="nav-btn" id="tab-shop" onclick="showTab('shop')">SHOP</button>
+        </div>
+
+        <div id="view-match" class="tab-view">
+            <h3 id="match-type-header">Matchday</h3>
+            
+            <div class="scoreboard">
+                <span id="sb-home">HOME</span>
+                <span id="sb-score" style="color:#00ff88; font-size:18px;">0 - 0</span>
+                <span id="sb-away">AWAY</span>
+                <span class="live-timer" id="sb-timer">00'</span>
+            </div>
+            
+            <div class="pitch-container">
+                <div class="center-circle"></div>
+                <div class="ball" id="pitch-ball"></div>
+            </div>
+            
+            <div id="match-ticker" style="font-style: italic; min-height: 45px; text-align: center; color: #8b949e; margin-bottom: 10px; font-size: 13px;">Ready for kick-off.</div>
+            <button class="btn" id="play-match-btn" onclick="runMatchEngine()">Play Match</button>
+        </div>
+
+        <div id="view-standings" class="tab-view" style="display:none;">
+            <h3 id="table-title">League Table</h3>
+            <div style="overflow-y: auto; max-height: 280px;">
+                <table>
+                    <thead>
+                        <tr><th>Pos</th><th>Team</th><th>OVR</th><th>P</th><th>Pts</th></tr>
+                    </thead>
+                    <tbody id="standings-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="view-skills" class="tab-view" style="display:none;">
+            <h3>Player Attributes</h3>
+            <div class="list-card">Pace: <span id="sk-pace">50</span>/99 <button class="btn" style="padding:4px; margin-top:4px;" onclick="trainSkill('pace')">Train Pace (-15 Energy)</button></div>
+            <div class="list-card">Shooting: <span id="sk-shoot">50</span>/99 <button class="btn" style="padding:4px; margin-top:4px;" onclick="trainSkill('shoot')">Train Shooting (-15 Energy)</button></div>
+            <div class="list-card">Passing: <span id="sk-pass">50</span>/99 <button class="btn" style="padding:4px; margin-top:4px;" onclick="trainSkill('pass')">Train Passing (-15 Energy)</button></div>
+        </div>
+
+        <div id="view-social" class="tab-view" style="display:none;">
+            <h3>Relations</h3>
+            <div class="list-card">Family: <span id="rel-family">80</span>/100 <button class="btn" style="padding:4px;" onclick="interact('family')">Visit (-10 Energy)</button></div>
+            <div class="list-card">Coach Trust: <span id="rel-coach">80</span>/100 <button class="btn" style="padding:4px;" onclick="interact('coach')">Strategy (-10 Energy)</button></div>
+            <div class="list-card">Girlfriend: <span id="rel-gf">80</span>/100 <button class="btn" style="padding:4px;" onclick="interact('gf')">Date (-10 Energy)</button></div>
+        </div>
+
+        <div id="view-shop" class="tab-view" style="display:none;">
+            <h3>Energy Drink Shop</h3>
+            <div class="list-card">Cheap Can (+20 Energy) 💵 10 Coins <button class="btn" style="padding:4px;" onclick="buyCan(10, 20)">Buy</button></div>
+            <div class="list-card">Pro Boost (+50 Energy) 💵 30 Coins <button class="btn" style="padding:4px;" onclick="buyCan(30, 50)">Buy</button></div>
+            <div class="list-card">Elite Fuel (+75 Energy) 💵 50 Coins <button class="btn" style="padding:4px;" onclick="buyCan(50, 75)">Buy</button></div>
+            <div class="list-card">Legendary Hyper (+100 Energy) 💵 100 Coins <button class="btn" style="padding:4px;" onclick="buyCan(100, 100)">Buy</button></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const top50Nations = [
+        {name: "Argentina", rating: 88}, {name: "Spain", rating: 87}, {name: "France", rating: 87}, 
+        {name: "England", rating: 86}, {name: "Portugal", rating: 85}, {name: "Brazil", rating: 85}, 
+        {name: "Morocco", rating: 84}, {name: "Netherlands", rating: 84}, {name: "Belgium", rating: 83}, 
+        {name: "Germany", rating: 83}, {name: "Croatia", rating: 82}, {name: "Italy", rating: 82}, 
+        {name: "Colombia", rating: 81}, {name: "Mexico", rating: 80}, {name: "Senegal", rating: 80}, 
+        {name: "Uruguay", rating: 80}, {name: "USA", rating: 79}, {name: "Japan", rating: 79}, 
+        {name: "Switzerland", rating: 78}, {name: "Iran", rating: 77}, {name: "Denmark", rating: 77}, 
+        {name: "Turkey", rating: 77}, {name: "Ecuador", rating: 76}, {name: "Austria", rating: 76}, 
+        {name: "South Korea", rating: 76}, {name: "Nigeria", rating: 75}, {name: "Australia", rating: 75}, 
+        {name: "Algeria", rating: 75}, {name: "Egypt", rating: 75}, {name: "Canada", rating: 74}, 
+        {name: "Norway", rating: 74}, {name: "Ukraine", rating: 74}, {name: "Ivory Coast", rating: 74}, 
+        {name: "Panama", rating: 73}, {name: "Russia", rating: 73}, {name: "Poland", rating: 73}, 
+        {name: "Wales", rating: 72}, {name: "Sweden", rating: 72}, {name: "Hungary", rating: 72}, 
+        {name: "Czechia", rating: 72}, {name: "Paraguay", rating: 71}, {name: "Scotland", rating: 71}, 
+        {name: "Serbia", rating: 71}, {name: "Cameroon", rating: 71}, {name: "Tunisia", rating: 70}, 
+        {name: "DR Congo", rating: 70}, {name: "Slovakia", rating: 70}, {name: "Greece", rating: 70}, 
+        {name: "Venezuela", rating: 69}, {name: "Uzbekistan", rating: 68}
+    ];
+
+    const leagues = {
+        "Premier League": [
+            {name: "Man City", rating: 88}, {name: "Arsenal", rating: 86}, {name: "Liverpool", rating: 85}, 
+            {name: "Tottenham", rating: 83}, {name: "Chelsea", rating: 82}, {name: "Man United", rating: 82}, 
+            {name: "Aston Villa", rating: 81}, {name: "Newcastle", rating: 81}, {name: "Brighton", rating: 79}, 
+            {name: "West Ham", rating: 78}, {name: "Bournemouth", rating: 77}, {name: "Fulham", rating: 77}, 
+            {name: "Crystal Palace", rating: 76}, {name: "Everton", rating: 76}, {name: "Brentford", rating: 75}, 
+            {name: "Wolves", rating: 75}, {name: "Nottingham Forest", rating: 74}, {name: "Leeds United", rating: 73}, 
+            {name: "Leicester City", rating: 73}, {name: "Ipswich Town", rating: 72}, {name: "Southampton", rating: 71}
+        ],
+        "La Liga": [
+            {name: "Real Madrid", rating: 89}, {name: "Barcelona", rating: 86}, {name: "Atletico Madrid", rating: 84}, 
+            {name: "Girona", rating: 81}, {name: "Athletic Club", rating: 80}, {name: "Real Sociedad", rating: 80}, 
+            {name: "Villarreal", rating: 79}, {name: "Real Betis", rating: 78}, {name: "Sevilla", rating: 77}, 
+            {name: "Valencia", rating: 76}, {name: "Osasuna", rating: 76}, {name: "Getafe", rating: 75}, 
+            {name: "Celta Vigo", rating: 75}, {name: "Rayo Vallecano", rating: 74}, {name: "Mallorca", rating: 74}, 
+            {name: "Alaves", rating: 73}, {name: "Las Palmas", rating: 73}, {name: "Espanyol", rating: 72}, 
+            {name: "Leganes", rating: 72}, {name: "Real Valladolid", rating: 71}, {name: "Almeria", rating: 70}
+        ],
+        "Bundesliga": [
+            {name: "Bayern Munich", rating: 87}, {name: "Bayer Leverkusen", rating: 86}, {name: "Borussia Dortmund", rating: 84}, 
+            {name: "RB Leipzig", rating: 83}, {name: "Stuttgart", rating: 81}, {name: "Eintracht Frankfurt", rating: 79}, 
+            {name: "Freiburg", rating: 78}, {name: "Hoffenheim", rating: 77}, {name: "Wolfsburg", rating: 76}, 
+            {name: "Werder Bremen", rating: 76}, {name: "Augsburg", rating: 75}, {name: "Gladbach", rating: 75}, 
+            {name: "Heidenheim", rating: 74}, {name: "Union Berlin", rating: 74}, {name: "Mainz 05", rating: 73}, 
+            {name: "Bochum", rating: 72}, {name: "Koln", rating: 71}, {name: "Schalke 04", rating: 70},
+            {name: "Hertha Berlin", rating: 70}, {name: "Hamburger SV", rating: 70}, {name: "Darmstadt", rating: 69}
+        ],
+        "Serie A": [
+            {name: "Inter Milan", rating: 86}, {name: "AC Milan", rating: 84}, {name: "Juventus", rating: 84}, 
+            {name: "Atalanta", rating: 82}, {name: "AS Roma", rating: 81}, {name: "Napoli", rating: 81}, 
+            {name: "Lazio", rating: 79}, {name: "Fiorentina", rating: 78}, {name: "Bologna", rating: 78}, 
+            {name: "Torino", rating: 77}, {name: "Monza", rating: 75}, {name: "Genoa", rating: 75}, 
+            {name: "Udinese", rating: 74}, {name: "Lecce", rating: 73}, {name: "Empoli", rating: 73}, 
+            {name: "Hellas Verona", rating: 73}, {name: "Cagliari", rating: 72}, {name: "Parma", rating: 72}, 
+            {name: "Como", rating: 72}, {name: "Sassuolo", rating: 72}, {name: "Sampdoria", rating: 70}
+        ]
+    };
+
+    let pName = "", pPos = "", age = 16, club = "", nation = "", energy = 100, coins = 0;
+    let stats = { pace: 50, shoot: 50, pass: 50 };
+    let relations = { family: 80, coach: 80, gf: 80 };
+    let currentLeague = "Premier League";
+    let leagueTable = [];
+    let matchesPlayed = 0;
+    let isSeniorTeam = false;
+
+    // FORCED IMMEDIATE EXECUTION RULE
+    function initializeGameSetup() {
+        const nSel = document.getElementById('setup-nation');
+        if (nSel) {
+            nSel.innerHTML = "";
+            top50Nations.forEach(nat => {
+                nSel.add(new Option(`${nat.name} (OVR ${nat.rating})`, nat.name));
+            });
+        }
+        populateClubs();
+    }
+
+    function populateClubs() {
+        const lSel = document.getElementById('setup-league');
+        const cSel = document.getElementById('setup-club');
+        if (!lSel || !cSel) return;
+        
+        const l = lSel.value;
+        cSel.innerHTML = "";
+        if (leagues[l]) {
+            leagues[l].forEach(team => {
+                cSel.add(new Option(`${team.name} Youth Academy (OVR ${team.rating})`, team.name));
+            });
+        }
+    }
+
+    // Direct initialization invocation
+    setTimeout(initializeGameSetup, 50);
+
+    function buildStandings() {
+        leagueTable = [];
+        const selectedLeague = document.getElementById('setup-league').value;
+        leagues[selectedLeague].forEach((team) => {
+            let baselinePoints = Math.round((team.rating - 68) * 2.8);
+            leagueTable.push({ name: team.name, rating: team.rating, pts: Math.max(0, baselinePoints) + Math.floor(Math.random()*4), played: matchesPlayed });
+        });
+        sortStandings();
+    }
+
+    function sortStandings() {
+        leagueTable.sort((a,b) => b.pts - a.pts);
+    }
+
+    function renderStandings() {
+        const tbody = document.getElementById('standings-body');
+        tbody.innerHTML = "";
+        leagueTable.forEach((team, idx) => {
+            const row = document.createElement('tr');
+            const cleanClubName = club.replace(" Youth Academy", "");
+            if(team.name === cleanClubName) row.className = "highlight-row";
+            row.innerHTML = `<td>${idx+1}</td><td>${team.name}</td><td>${team.rating}</td><td>${team.played}</td><td>${team.pts}</td>`;
+            tbody.appendChild(row);
+        });
+    }
+
+    function startGame() {
+        const first = document.getElementById('setup-first').value;
+        const last = document.getElementById('setup-last').value;
+        pName = first + " " + last;
+        pPos = document.getElementById('setup-pos').value;
+        currentLeague = document.getElementById('setup-league').value;
+        club = document.getElementById('setup-club').value;
+        nation = document.getElementById('setup-nation').value;
+        
+        const path = document.getElementById('setup-path').value;
+        let baseRating = 50;
+        if (path === 'underdog') baseRating = Math.floor(Math.random() * 20) + 35;
+        if (path === 'potential') baseRating = Math.floor(Math.random() * 25) + 55;
+        if (path === 'legend') baseRating = Math.floor(Math.random() * 20) + 80;
+
+        stats.pace = baseRating; stats.shoot = baseRating; stats.pass = baseRating;
+        buildStandings();
+        document.getElementById('screen-setup').style.display = 'none';
+        document.getElementById('game-hub').style.display = 'block';
+        updateUI();
+    }
+
+    function updateUI() {
+        const ovr = Math.round((stats.pace + stats.shoot + stats.pass) / 3);
+        if (ovr >= 70 && !isSeniorTeam) {
+            isSeniorTeam = true;
+            club = club.replace(" Youth Academy", "");
+            alert("🔥 Promoted! You are now playing in the Senior First Team squad!");
+        }
+        document.getElementById('hud-name').innerText = pName + ` (${pPos})`;
+        document.getElementById('hud-age').innerText = `${age} (S${Math.floor(matchesPlayed/10)+1})`;
+        document.getElementById('hud-club').innerText = club;
+        document.getElementById('hud-nation').innerText = nation;
+        document.getElementById('hud-ovr').innerText = ovr;
+        document.getElementById('hud-energy').innerText = energy + "%";
+        document.getElementById('hud-coins').innerText = coins;
+        document.getElementById('hud-status').innerText = isSeniorTeam ? "Senior" : "Academy";
+        
+        document.getElementById('sk-pace').innerText = stats.pace;
+        document.getElementById('sk-shoot').innerText = stats.shoot;
+        document.getElementById('sk-pass').innerText = stats.pass;
+        document.getElementById('rel-family').innerText = relations.family;
+        document.getElementById('rel-coach').innerText = relations.coach;
+        document.getElementById('rel-gf').innerText = relations.gf;
+
+        renderStandings();
+    }
+
+    function showTab(tabName) {
+        document.querySelectorAll('.tab-view').forEach(v => v.style.display = 'none');
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-tab'));
+        document.getElementById('view-' + tabName).style.display = 'block';
+        document.getElementById('tab-' + tabName).classList.add('active-tab');
+    }
+
+    function trainSkill(skill) {
+        if (energy < 15) { alert("Too tired!"); return; }
+        energy -= 15; if (stats[skill] < 99) stats[skill] += 2;
+        for (let s in stats) { if (s !== skill && stats[s] > 1) stats[s] -= 1; }
+        updateUI();
+    }
+
+    function interact(type) {
+        if (energy < 10) { alert("Too tired!"); return; }
+        energy -= 10; relations[type] = Math.min(100, relations[type] + 15);
+        updateUI();
+    }
+
+    function buyCan(cost, gain) {
+        if (coins < cost) { alert("Need more coins!"); return; }
+        coins -= cost; energy = Math.min(100, energy + gain);
+        updateUI();
+    }
+
+    function runMatchEngine() {
+        if (age >= 40) { alert("End of career!"); return; }
+        if (energy < 30) { alert("Low energy danger! Grab a drink first."); return; }
+
+        energy -= 25;
+        const ball = document.getElementById('pitch-ball');
+        const ticker = document.getElementById('match-ticker');
+        const playBtn = document.getElementById('play-match-btn');
+        
+        const cleanClub = club.replace(" Youth Academy", "");
+        const oppList = leagues[currentLeague].filter(t => t.name !== cleanClub);
+        const opponentObj = oppList[Math.floor(Math.random() * oppList.length)];
+        const opponent = opponentObj.name;
+        
+        const myClubObj = leagues[currentLeague].find(t => t.name === cleanClub) || {rating: 75};
+        const pOvr = Math.round((stats.pace + stats.shoot + stats.pass) / 3);
+        
+        const myTeamStrength = myClubObj.rating + (pOvr * 0.1); 
+        const opponentStrength = opponentObj.rating;
+
+        document.getElementById('sb-home').innerText = cleanClub.substring(0,6).toUpperCase();
+        document.getElementById('sb-away').innerText = opponent.substring(0,6).toUpperCase();
+        
+        playBtn.disabled = true;
+        let myScore = 0, oppScore = 0, minute = 0;
+
+        let matchInterval = setInterval(() => {
+            minute += 15;
+            document.getElementById('sb-timer').innerText = minute + "'";
+            document.getElementById('sb-score').innerText = `${myScore} - ${oppScore}`;
+
+            ball.style.left = Math.floor(Math.random() * 85) + "%";
+            ball.style.top = Math.floor(Math.random() * 75) + "%";
+
+            let advantageFactor = (myTeamStrength - opponentStrength) * 0.022; 
+            let oppChance = 0.18 - advantageFactor;
+            let myChance = 0.18 + advantageFactor;
+
+            let roll = Math.random();
+            if (roll < oppChance) {
+                oppScore++;
+                ticker.innerText = `${minute}' - GOAL for ${opponent}! Real rating tactical dominance.`;
+            } else if (roll < (oppChance + myChance)) {
+                myScore++;
+                ticker.innerText = `${minute}' - GOAL! Beautiful combination lets you break the line!`;
+            } else {
+                ticker.innerText = `${minute}' - End-to-end tactical match unfolding.`;
+            }
+
+            if (minute >= 90) {
+                clearInterval(matchInterval);
+                document.getElementById('sb-timer').innerText = "FT";
+                
+                let performance = Math.floor(Math.random() * 5) + 5;
+                if ((relations.family + relations.coach + relations.gf)/3 < 40) performance -= 2;
+                performance = Math.max(3, Math.min(10, performance));
+
+                let reward = performance === 10 ? 50 : (performance === 3 ? 2 : Math.round(2 + ((performance - 3) * 6.8)));
+                coins += reward;
+                matchesPlayed++;
+
+                leagueTable.forEach(t => {
+                    if(t.name === cleanClub) { t.pts += (myScore > oppScore ? 3 : (myScore === oppScore ? 1 : 0)); t.played++; }
+                    if(t.name === opponent) { t.pts += (oppScore > myScore ? 3 : (myScore === oppScore ? 1 : 0)); t.played++; }
+                });
+                sortStandings();
+
+                relations.family = Math.max(0, relations.family - 5);
+                relations.coach = Math.max(0, relations.coach - 5);
+                relations.gf = Math.max(0, relations.gf - 5);
+
+                if (matchesPlayed % 10 === 0) { age += 1; alert(`🎉 Season complete! You are now ${age} years old.`); }
+
+                ticker.innerText = `Full-Time! Match Rating: ${performance}/10. Earned: ${reward} Coins.`;
+                playBtn.disabled = false;
+                updateUI();
+            }
+        }, 600);
+    }
+</script>
+
+</body>
+</html>
