@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poluser Pro Career 26 | Global Fix</title>
+    <title>Poluser Pro Career 26 | Full League Sim</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -147,11 +147,11 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 11px;
             margin-top: 5px;
         }
         th, td {
-            padding: 6px;
+            padding: 5px;
             text-align: left;
             border-bottom: 1px solid #30363d;
         }
@@ -180,8 +180,7 @@
         </select>
 
         <label>Select Nationality (Top 50 Nations)</label>
-        <select id="setup-nation">
-            </select>
+        <select id="setup-nation"></select>
 
         <label>Select Club League</label>
         <select id="setup-league" onchange="populateClubs()">
@@ -192,8 +191,7 @@
         </select>
 
         <label>Select Starting Youth Academy</label>
-        <select id="setup-club">
-            </select>
+        <select id="setup-club"></select>
 
         <label>Starting Career Path</label>
         <select id="setup-path">
@@ -245,11 +243,11 @@
         </div>
 
         <div id="view-standings" class="tab-view" style="display:none;">
-            <h3 id="table-title">League Table</h3>
+            <h3>League Table</h3>
             <div style="overflow-y: auto; max-height: 280px;">
                 <table>
                     <thead>
-                        <tr><th>Pos</th><th>Team</th><th>OVR</th><th>P</th><th>Pts</th></tr>
+                        <tr><th>Pos</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>Pts</th></tr>
                     </thead>
                     <tbody id="standings-body"></tbody>
                 </table>
@@ -309,7 +307,7 @@
             {name: "West Ham", rating: 78}, {name: "Bournemouth", rating: 77}, {name: "Fulham", rating: 77}, 
             {name: "Crystal Palace", rating: 76}, {name: "Everton", rating: 76}, {name: "Brentford", rating: 75}, 
             {name: "Wolves", rating: 75}, {name: "Nottingham Forest", rating: 74}, {name: "Leeds United", rating: 73}, 
-            {name: "Leicester City", rating: 73}, {name: "Ipswich Town", rating: 72}, {name: "Southampton", rating: 71}
+            {name: "Leicester City", rating: 73}, {name: "Ipswich Town", rating: 72}
         ],
         "La Liga": [
             {name: "Real Madrid", rating: 89}, {name: "Barcelona", rating: 86}, {name: "Atletico Madrid", rating: 84}, 
@@ -318,7 +316,7 @@
             {name: "Valencia", rating: 76}, {name: "Osasuna", rating: 76}, {name: "Getafe", rating: 75}, 
             {name: "Celta Vigo", rating: 75}, {name: "Rayo Vallecano", rating: 74}, {name: "Mallorca", rating: 74}, 
             {name: "Alaves", rating: 73}, {name: "Las Palmas", rating: 73}, {name: "Espanyol", rating: 72}, 
-            {name: "Leganes", rating: 72}, {name: "Real Valladolid", rating: 71}, {name: "Almeria", rating: 70}
+            {name: "Leganes", rating: 72}, {name: "Real Valladolid", rating: 71}
         ],
         "Bundesliga": [
             {name: "Bayern Munich", rating: 87}, {name: "Bayer Leverkusen", rating: 86}, {name: "Borussia Dortmund", rating: 84}, 
@@ -327,7 +325,7 @@
             {name: "Werder Bremen", rating: 76}, {name: "Augsburg", rating: 75}, {name: "Gladbach", rating: 75}, 
             {name: "Heidenheim", rating: 74}, {name: "Union Berlin", rating: 74}, {name: "Mainz 05", rating: 73}, 
             {name: "Bochum", rating: 72}, {name: "Koln", rating: 71}, {name: "Schalke 04", rating: 70},
-            {name: "Hertha Berlin", rating: 70}, {name: "Hamburger SV", rating: 70}, {name: "Darmstadt", rating: 69}
+            {name: "Hertha Berlin", rating: 70}, {name: "Hamburger SV", rating: 70}
         ],
         "Serie A": [
             {name: "Inter Milan", rating: 86}, {name: "AC Milan", rating: 84}, {name: "Juventus", rating: 84}, 
@@ -336,7 +334,7 @@
             {name: "Torino", rating: 77}, {name: "Monza", rating: 75}, {name: "Genoa", rating: 75}, 
             {name: "Udinese", rating: 74}, {name: "Lecce", rating: 73}, {name: "Empoli", rating: 73}, 
             {name: "Hellas Verona", rating: 73}, {name: "Cagliari", rating: 72}, {name: "Parma", rating: 72}, 
-            {name: "Como", rating: 72}, {name: "Sassuolo", rating: 72}, {name: "Sampdoria", rating: 70}
+            {name: "Como", rating: 72}, {name: "Sassuolo", rating: 72}
         ]
     };
 
@@ -348,7 +346,6 @@
     let matchesPlayed = 0;
     let isSeniorTeam = false;
 
-    // FORCED IMMEDIATE EXECUTION RULE
     function initializeGameSetup() {
         const nSel = document.getElementById('setup-nation');
         if (nSel) {
@@ -374,17 +371,23 @@
         }
     }
 
-    // Direct initialization invocation
     setTimeout(initializeGameSetup, 50);
 
+    // FIXED: Resets all points perfectly to 0 at start
     function buildStandings() {
         leagueTable = [];
         const selectedLeague = document.getElementById('setup-league').value;
         leagues[selectedLeague].forEach((team) => {
-            let baselinePoints = Math.round((team.rating - 68) * 2.8);
-            leagueTable.push({ name: team.name, rating: team.rating, pts: Math.max(0, baselinePoints) + Math.floor(Math.random()*4), played: matchesPlayed });
+            leagueTable.push({ 
+                name: team.name, 
+                rating: team.rating, 
+                played: 0, 
+                wins: 0, 
+                draws: 0, 
+                losses: 0, 
+                pts: 0 
+            });
         });
-        sortStandings();
     }
 
     function sortStandings() {
@@ -398,7 +401,7 @@
             const row = document.createElement('tr');
             const cleanClubName = club.replace(" Youth Academy", "");
             if(team.name === cleanClubName) row.className = "highlight-row";
-            row.innerHTML = `<td>${idx+1}</td><td>${team.name}</td><td>${team.rating}</td><td>${team.played}</td><td>${team.pts}</td>`;
+            row.innerHTML = `<td>${idx+1}</td><td>${team.name}</td><td>${team.played}</td><td>${team.wins}</td><td>${team.draws}</td><td>${team.losses}</td><td><strong>${team.pts}</strong></td>`;
             tbody.appendChild(row);
         });
     }
@@ -477,6 +480,42 @@
         updateUI();
     }
 
+    // NEW ENGINE: Simulates other teams matches at the exact same time
+    function simulateOtherMatches(yourClub, opponentClub) {
+        let availableTeams = leagueTable.filter(t => t.name !== yourClub && t.name !== opponentClub);
+        
+        // Shuffle teams to create random pairs
+        availableTeams.sort(() => Math.random() - 0.5);
+        
+        for (let i = 0; i < availableTeams.length; i += 2) {
+            if (i + 1 >= availableTeams.length) break; 
+            
+            let teamA = availableTeams[i];
+            let teamB = availableTeams[i+1];
+            
+            let scoreA = Math.floor(Math.random() * 4);
+            let scoreB = Math.floor(Math.random() * 4);
+            
+            // Apply rating advantages slightly
+            if (teamA.rating > teamB.rating && Math.random() > 0.4) scoreA += 1;
+            if (teamB.rating > teamA.rating && Math.random() > 0.4) scoreB += 1;
+            
+            teamA.played += 1;
+            teamB.played += 1;
+            
+            if (scoreA > scoreB) {
+                teamA.wins += 1; teamA.pts += 3;
+                teamB.losses += 1;
+            } else if (scoreB > scoreA) {
+                teamB.wins += 1; teamB.pts += 3;
+                teamA.losses += 1;
+            } else {
+                teamA.draws += 1; teamA.pts += 1;
+                teamB.draws += 1; teamB.pts += 1;
+            }
+        }
+    }
+
     function runMatchEngine() {
         if (age >= 40) { alert("End of career!"); return; }
         if (energy < 30) { alert("Low energy danger! Grab a drink first."); return; }
@@ -518,12 +557,12 @@
             let roll = Math.random();
             if (roll < oppChance) {
                 oppScore++;
-                ticker.innerText = `${minute}' - GOAL for ${opponent}! Real rating tactical dominance.`;
+                ticker.innerText = `${minute}' - GOAL for ${opponent}!`;
             } else if (roll < (oppChance + myChance)) {
                 myScore++;
-                ticker.innerText = `${minute}' - GOAL! Beautiful combination lets you break the line!`;
+                ticker.innerText = `${minute}' - GOAL! You find the back of the net!`;
             } else {
-                ticker.innerText = `${minute}' - End-to-end tactical match unfolding.`;
+                ticker.innerText = `${minute}' - Tactical battle continues in midfield.`;
             }
 
             if (minute >= 90) {
@@ -538,10 +577,26 @@
                 coins += reward;
                 matchesPlayed++;
 
-                leagueTable.forEach(t => {
-                    if(t.name === cleanClub) { t.pts += (myScore > oppScore ? 3 : (myScore === oppScore ? 1 : 0)); t.played++; }
-                    if(t.name === opponent) { t.pts += (oppScore > myScore ? 3 : (myScore === oppScore ? 1 : 0)); t.played++; }
-                });
+                // FIXED: Direct calculation applying precise football logic rules (3-1-0)
+                let pTeam = leagueTable.find(t => t.name === cleanClub);
+                let oTeam = leagueTable.find(t => t.name === opponent);
+                
+                if (pTeam) pTeam.played += 1;
+                if (oTeam) oTeam.played += 1;
+
+                if (myScore > oppScore) {
+                    if(pTeam) { pTeam.wins += 1; pTeam.pts += 3; }
+                    if(oTeam) { oTeam.losses += 1; }
+                } else if (oppScore > myScore) {
+                    if(oTeam) { oTeam.wins += 1; oTeam.pts += 3; }
+                    if(pTeam) { pTeam.losses += 1; }
+                } else {
+                    if(pTeam) { pTeam.draws += 1; pTeam.pts += 1; }
+                    if(oTeam) { oTeam.draws += 1; oTeam.pts += 1; }
+                }
+
+                // Simulate all other AI teams concurrently
+                simulateOtherMatches(cleanClub, opponent);
                 sortStandings();
 
                 relations.family = Math.max(0, relations.family - 5);
